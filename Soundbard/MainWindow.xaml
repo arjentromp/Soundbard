@@ -42,6 +42,13 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Treeview Item style -->
+        <Style TargetType="TreeViewItem">
+            <Setter Property="Foreground" Value="#FFCCCCCC"/>
+            <Setter Property="FontSize" Value="16"/>
+        </Style>
+
     </Window.Resources>
 
     <Grid>
@@ -120,12 +127,48 @@
 
             <!-- Directory -->
             <Grid Grid.Column="1" Background="#2A2C33">
-                <TreeView x:Name="FolderTree" Background="#2A2C33" Foreground="White" BorderThickness="0" Margin="5">
+                <TreeView x:Name="FolderTree"
+                  Background="#2A2C33"
+                  Foreground="White"
+                  BorderThickness="0"
+                  Margin="5"
+                  ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                  ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+
+                    <TreeView.Resources>
+
+                        <ContextMenu x:Key="FolderMenu">
+                            <MenuItem Header="Rename" Click="Rename_Click"/>
+                        </ContextMenu>
+
+                        <Style TargetType="TreeViewItem">
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="FontSize" Value="15"/>
+                            <Setter Property="ContextMenu" Value="{StaticResource FolderMenu}"/>
+
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Foreground" Value="#4FD1C5"/>
+                                </Trigger>
+
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="#38B2AC"/>
+                                </Trigger>
+                            </Style.Triggers>
+
+                        </Style>
+
+                    </TreeView.Resources>
+
+
                     <!-- Sample Root Folder -->
-                    <TreeViewItem Header="Root Folder" IsExpanded="True">
-                        <TreeViewItem Header="Subfolder 1"/>
-                        <TreeViewItem Header="Subfolder 2"/>
-                        <TreeViewItem Header="File1.txt"/>
+                    <TreeViewItem Header="📁 Root Folder" IsExpanded="True">
+                        <TreeViewItem Header="📁 Subfolder 1"/>
+                        <TreeViewItem Header="📁 Subfolder 2">
+                            <TreeViewItem Header="📄 File1.txt"/>
+                        </TreeViewItem>
+                        <TreeViewItem Header="📄 File1.txt"/>
+                        
                     </TreeViewItem>
                 </TreeView>
             </Grid>
