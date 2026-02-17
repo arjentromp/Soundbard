@@ -11,6 +11,9 @@ using System.Windows.Shapes;
 
 namespace Soundbard
 {
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
@@ -18,48 +21,27 @@ namespace Soundbard
             InitializeComponent();
         }
 
-        private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
-                DragMove();
+            DragMove();
         }
 
-        private void Minimize_Click(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState.Minimized;
-        }
-
-        private void Maximize_Click(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState == WindowState.Maximized
-                ? WindowState.Normal
-                : WindowState.Maximized;
-        }
-
-        private void Close_Click(object sender, RoutedEventArgs e)
+        private void btnClose_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
 
-        // MainWindow.xaml.cs
-        private void Rename_Click(object sender, RoutedEventArgs e)
+        private void btnMaximize_Click(object sender, RoutedEventArgs e)
         {
-            if (FolderTree.SelectedItem is TreeViewItem selected)
-            {
-                MessageBox.Show($"Rename clicked on: {selected.Header}");
-                // Later: replace Header with a TextBox for inline editing
-            }
+            if (WindowState == WindowState.Maximized)
+                WindowState = WindowState.Normal;
+            else
+                WindowState = WindowState.Maximized;
         }
 
-        private void NewFolder_Click(object sender, RoutedEventArgs e)
+        private void btnMinimize_Click(object sender, RoutedEventArgs e)
         {
-            if (FolderTree.SelectedItem is TreeViewItem selected)
-            {
-                var newFolder = new TreeViewItem() { Header = "New Folder" };
-                selected.Items.Add(newFolder);
-                selected.IsExpanded = true;
-            }
+            WindowState = WindowState.Minimized;
         }
-
     }
 }

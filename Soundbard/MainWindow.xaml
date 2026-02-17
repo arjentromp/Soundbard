@@ -4,187 +4,76 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Soundbard"
-        mc:Ignorable="d"
-        Title="SoundBard"
-        Height="450"
-        Width="800"
-        WindowStyle="None"
-        ResizeMode="CanResize"
-        Background="#1E1F24">
-
-    <!-- ================= Window Resources ================= -->
-    <Window.Resources>
-        <!-- Sidebar button style -->
-        <Style x:Key="SidebarButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="35"/>
-            <Setter Property="Height" Value="35"/>
-            <Setter Property="Background" Value="#414348"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Margin" Value="0,0,0,10"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#4FD1C5"/>
-                                <Setter Property="Foreground" Value="#1E1F24"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#38B2AC"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Treeview Item style -->
-        <Style TargetType="TreeViewItem">
-            <Setter Property="Foreground" Value="#FFCCCCCC"/>
-            <Setter Property="FontSize" Value="16"/>
-        </Style>
-
-    </Window.Resources>
-
+        mc:Ignorable="d" WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        Title="MainWindow" Height="800" Width="1500"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="0" CornerRadius="0" CaptionHeight="0"/>
+    </WindowChrome.WindowChrome>
     <Grid>
-
-        <!-- Rows: Title Bar + Main Content -->
+        <!-- Grid definitions for header and window -->
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <!-- ================= Title Bar ================= -->
-        <Grid Grid.Row="0"
-              Background="#FF18191D"
-              MouseDown="TitleBar_MouseDown">
-
+        
+        <!-- Title bar -->
+        <Grid Grid.Row="0" Background="#FF1F1F1F">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <!-- App Title -->
-            <TextBlock Text="🎵 Soundbard"
-                       VerticalAlignment="Center"
-                       Margin="10,0"
-                       Foreground="#E6E8EE"
-                       FontWeight="SemiBold"
-                       FontSize="14"/>
+            <TextBlock Grid.Column="0" Text="SoundBard" VerticalAlignment="Center"
+                       Foreground="White" Margin="20,0,0,0" FontSize="16"/>
 
-            <!-- Window Buttons -->
-            <StackPanel Grid.Column="1"
-                        Orientation="Horizontal">
-
-                <Button Content="—"
-                        Width="40"
-                        Background="Transparent"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Click="Minimize_Click"/>
-
-                <Button Content="□"
-                        Width="40"
-                        Background="Transparent"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Click="Maximize_Click"/>
-
-                <Button Content="X"
-                        Width="40"
-                        Background="Transparent"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Click="Close_Click"/>
+            <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button x:Name="btnMinimize" Content="➖" Width="45" Height="35"
+                        BorderBrush="Transparent" Background="Transparent"
+                        Foreground="White" FontSize="15" Cursor="Hand"
+                        Click="btnMinimize_Click"/>
+                <Button x:Name="btnMaximize" Content="🗖" Width="45" Height="35"
+                        BorderBrush="Transparent" Background="Transparent"
+                        Foreground="White" FontSize="15" Cursor="Hand"
+                        Click="btnMaximize_Click"/>
+                <Button x:Name="btnClose" Content="❌" Width="45" Height="35"
+                        BorderBrush="Transparent" Background="Transparent"
+                        Foreground="White" FontSize="15" Cursor="Hand"
+                        Click="btnClose_Click"/>
             </StackPanel>
-
         </Grid>
-
-        <!-- ================= Main Layout ================= -->
+        
+        <!-- Content -->
         <Grid Grid.Row="1">
-
+            <!-- Grid definitions for Menu, Foldertree and Workspace -->
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50"/>
-                <ColumnDefinition Width="200" MinWidth="150" MaxWidth="750"/>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="5*" MinWidth="130" MaxWidth="850"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="18*"/>
             </Grid.ColumnDefinitions>
-
+            
             <!-- Menu -->
-            <StackPanel Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,10,0,0">
-                <Button Content="🎵" Style="{StaticResource SidebarButtonStyle}"/>
-                <Button Content="⏹" Style="{StaticResource SidebarButtonStyle}"/>
-                <Button Content="⚙" Style="{StaticResource SidebarButtonStyle}"/>
-                <Button Content="❌" Style="{StaticResource SidebarButtonStyle}" Margin="0"/>
+            <StackPanel Grid.Column="0" Background="#FF1F1F1F">
+                <Button x:Name="btnSave" Content="💾" Height="40" Cursor="Hand"
+                        Background="Transparent" BorderBrush="Transparent" Foreground="White"/>
+                <Button x:Name="btnLoad" Content="📂" Height="40" Cursor="Hand"
+                        Background="Transparent" BorderBrush="Transparent" Foreground="White"/>
+                <Button x:Name="btnSettings" Content="⚙️" Height="40" Cursor="Hand"
+                        Background="Transparent" BorderBrush="Transparent" Foreground="White"/>
             </StackPanel>
-
-
-
-            <!-- Directory -->
-            <Grid Grid.Column="1" Background="#2A2C33">
-                <TreeView x:Name="FolderTree"
-                  Background="#2A2C33"
-                  Foreground="White"
-                  BorderThickness="0"
-                  Margin="5"
-                  ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                  ScrollViewer.HorizontalScrollBarVisibility="Hidden">
-
-                    <TreeView.Resources>
-
-                        <ContextMenu x:Key="FolderMenu">
-                            <MenuItem Header="Rename" Click="Rename_Click"/>
-                        </ContextMenu>
-
-                        <Style TargetType="TreeViewItem">
-                            <Setter Property="Foreground" Value="White"/>
-                            <Setter Property="FontSize" Value="15"/>
-                            <Setter Property="ContextMenu" Value="{StaticResource FolderMenu}"/>
-
-                            <Style.Triggers>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Foreground" Value="#4FD1C5"/>
-                                </Trigger>
-
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Foreground" Value="#38B2AC"/>
-                                </Trigger>
-                            </Style.Triggers>
-
-                        </Style>
-
-                    </TreeView.Resources>
-
-
-                    <!-- Sample Root Folder -->
-                    <TreeViewItem Header="📁 Root Folder" IsExpanded="True">
-                        <TreeViewItem Header="📁 Subfolder 1"/>
-                        <TreeViewItem Header="📁 Subfolder 2">
-                            <TreeViewItem Header="📄 File1.txt"/>
-                        </TreeViewItem>
-                        <TreeViewItem Header="📄 File1.txt"/>
-                        
-                    </TreeViewItem>
-                </TreeView>
-            </Grid>
-
-            <!-- Splitter -->
-            <GridSplitter Grid.Column="2"
-                          Width="5"
-                          HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch"
-                          ResizeBehavior="PreviousAndNext"
-                          Background="#2A2C33"/>
-
-            <!-- Tracks -->
-            <Grid Grid.Column="3" Background="#1E1F24"/>
-
+            
+            <!-- Foldertree -->
+            <Grid Grid.Column="1" Background="#262422"></Grid>
+            
+            <!-- GridSplitter -->
+            <GridSplitter Grid.Column="2" Width="5" HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch" ResizeBehavior="PreviousAndNext"
+                          Background="#262422"/>
+            
+            <!-- Workspace -->
+            <Grid Grid.Column="3" Background="#302E2B"></Grid>
         </Grid>
-
     </Grid>
 </Window>
