@@ -19,6 +19,20 @@ namespace Soundbard
         public MainWindow()
         {
             InitializeComponent();
+
+            this.StateChanged += Window_StateChanged;
+        }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            if (WindowState == WindowState.Maximized)
+             {
+                MainGrid.Margin = new Thickness(7);
+            }
+            else
+            {
+                MainGrid.Margin = new Thickness(0);
+            }
         }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -26,22 +40,5 @@ namespace Soundbard
             DragMove();
         }
 
-        private void btnClose_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        private void btnMaximize_Click(object sender, RoutedEventArgs e)
-        {
-            if (WindowState == WindowState.Maximized)
-                WindowState = WindowState.Normal;
-            else
-                WindowState = WindowState.Maximized;
-        }
-
-        private void btnMinimize_Click(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState.Minimized;
-        }
     }
 }
