@@ -9,8 +9,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
+    <None Remove="Fonts\Cinzel-Black.ttf" />
+    <None Remove="Fonts\Cinzel-Bold.ttf" />
+    <None Remove="Fonts\Cinzel-ExtraBold.ttf" />
+    <None Remove="Fonts\Cinzel-Medium.ttf" />
+    <None Remove="Fonts\Cinzel-Regular.ttf" />
+    <None Remove="Fonts\Cinzel-SemiBold.ttf" />
+    <None Remove="Fonts\Cinzel-VariableFont_wght.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Fonts\Cinzel-Black.ttf" />
+    <Resource Include="Fonts\Cinzel-Bold.ttf" />
+    <Resource Include="Fonts\Cinzel-ExtraBold.ttf" />
+    <Resource Include="Fonts\Cinzel-Medium.ttf" />
+    <Resource Include="Fonts\Cinzel-Regular.ttf" />
+    <Resource Include="Fonts\Cinzel-SemiBold.ttf" />
+    <Resource Include="Fonts\Cinzel-VariableFont_wght.ttf" />
   </ItemGroup>
 
 </Project>

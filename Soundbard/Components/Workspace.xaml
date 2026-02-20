@@ -10,29 +10,32 @@
     mc:Ignorable="d">
     <ScrollViewer Background="#302E2B" VerticalScrollBarVisibility="Auto">
         <WrapPanel Margin="10" Orientation="Horizontal">
-
             <!--  Hardcoded track cards for now  -->
             <local:TrackCard Margin="8" />
             <local:TrackCard Margin="8" />
             <local:TrackCard Margin="8" />
-
             <!--  The + button always sits after the last card  -->
-            <Border
-                Width="210"
-                Height="140"
-                Margin="8"
-                Background="Transparent"
-                BorderBrush="Orange"
-                BorderThickness="1"
-                CornerRadius="10">
+            <Grid
+                Width="280"
+                Height="180"
+                Margin="8">
+                <Rectangle
+                    Fill="Transparent"
+                    RadiusX="10"
+                    RadiusY="10"
+                    Stroke="Orange"
+                    StrokeDashArray="4,3"
+                    StrokeThickness="2" />
                 <Button
+                    VerticalContentAlignment="center"
                     Background="Transparent"
                     BorderBrush="Transparent"
                     Content="+"
                     Cursor="Hand"
-                    FontSize="28"
-                    Foreground="orange" />
-            </Border>
+                    FontSize="50"
+                    FontWeight="Bold"
+                    Foreground="Orange" />
+            </Grid>
         </WrapPanel>
     </ScrollViewer>
 </UserControl>

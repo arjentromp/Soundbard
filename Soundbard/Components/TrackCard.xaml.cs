@@ -10,6 +10,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Soundbard.Models;
+using Soundbard.ViewModels;
 
 namespace Soundbard.Components
 {
@@ -21,6 +23,13 @@ namespace Soundbard.Components
         public TrackCard()
         {
             InitializeComponent();
+            DataContext = new TrackViewModel
+            {
+                PlayMode = PlayMode.Continuous,
+                QueueMode = QueueMode.Shuffle,
+                FadeEnabled = true,
+                FadeDuration = 2
+            };
         }
     }
 }
