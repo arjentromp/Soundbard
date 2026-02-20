@@ -24,7 +24,7 @@
                     <ColumnDefinition
                         Width="5*"
                         MinWidth="130"
-                        MaxWidth="850" />
+                        MaxWidth="650" />
                     <ColumnDefinition Width="5" />
                     <ColumnDefinition Width="18*" />
                 </Grid.ColumnDefinitions>

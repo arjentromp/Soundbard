@@ -8,5 +8,31 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <Grid Background="#302E2B" />
+    <ScrollViewer Background="#302E2B" VerticalScrollBarVisibility="Auto">
+        <WrapPanel Margin="10" Orientation="Horizontal">
+
+            <!--  Hardcoded track cards for now  -->
+            <local:TrackCard Margin="8" />
+            <local:TrackCard Margin="8" />
+            <local:TrackCard Margin="8" />
+
+            <!--  The + button always sits after the last card  -->
+            <Border
+                Width="210"
+                Height="140"
+                Margin="8"
+                Background="Transparent"
+                BorderBrush="Orange"
+                BorderThickness="1"
+                CornerRadius="10">
+                <Button
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    Content="+"
+                    Cursor="Hand"
+                    FontSize="28"
+                    Foreground="orange" />
+            </Border>
+        </WrapPanel>
+    </ScrollViewer>
 </UserControl>

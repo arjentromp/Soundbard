@@ -23,11 +23,22 @@ namespace Soundbard.Components
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Close application
+        /// </summary>
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
             Window.GetWindow(this)?.Close();
         }
 
+        /// <summary>
+        /// Maximizes window
+        /// </summary>
+        /// <algo>
+        /// Check if window exists
+        /// Check current window state
+        /// Toggle the window state
+        /// </algo>
         private void btnMaximize_Click(object sender, RoutedEventArgs e)
         {
             var window = Window.GetWindow(this);
@@ -44,6 +55,9 @@ namespace Soundbard.Components
             }
         }
 
+        /// <summary>
+        /// Minimizes window
+        /// </summary>
         private void btnMinimize_Click(object sender, RoutedEventArgs e)
         {
             var window = Window.GetWindow(this);

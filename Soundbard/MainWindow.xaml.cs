@@ -23,6 +23,9 @@ namespace Soundbard
             this.StateChanged += Window_StateChanged;
         }
 
+        /// <summary>
+        /// Changes the margin when fullscreen to prevent cutting off the edges
+        /// </summary>
         private void Window_StateChanged(object sender, EventArgs e)
         {
             if (WindowState == WindowState.Maximized)
@@ -35,6 +38,9 @@ namespace Soundbard
             }
         }
 
+        /// <summary>
+        /// Makes the entire page draggable
+        /// </summary>
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DragMove();
