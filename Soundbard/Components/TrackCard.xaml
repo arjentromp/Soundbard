@@ -5,15 +5,15 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Soundbard.Components"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="140"
-    d:DesignWidth="210"
+    d:DesignHeight="180"
+    d:DesignWidth="280"
     mc:Ignorable="d">
     <Border
-        Width="210"
-        Height="140"
+        Width="280"
+        Height="180"
         Background="#262422"
         BorderBrush="red"
-        BorderThickness="1"
+        BorderThickness="2"
         CornerRadius="10">
         <Grid>
             <Grid.RowDefinitions>
@@ -23,13 +23,133 @@
             </Grid.RowDefinitions>
             <Border
                 Grid.Row="0"
-                BorderBrush="gray"
-                BorderThickness="0,0,0,1" />
-            <Grid />
+                BorderBrush="#3b3734"
+                BorderThickness="0,0,0,1">
+                <Border
+                    Grid.Row="0"
+                    BorderBrush="#3b3734"
+                    BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border
+                            Grid.Column="0"
+                            Width="40"
+                            Height="25"
+                            Margin="5"
+                            Background="#1A1717"
+                            BorderBrush="#3b3734"
+                            BorderThickness="1"
+                            CornerRadius="5">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="15"
+                                Foreground="White"
+                                Text="F3" />
+                        </Border>
+
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="0,5,0,0"
+                            VerticalAlignment="Center"
+                            FontFamily="pack://application:,,,/Fonts/#Cinzel"
+                            FontSize="26"
+                            Foreground="White"
+                            Text="Battle Music" />
+
+                        <Button
+                            Grid.Column="2"
+                            Width="13"
+                            Height="30"
+                            Margin="0,0,2,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            Content="⋮"
+                            Cursor="Hand"
+                            FontSize="20"
+                            FontWeight="Bold"
+                            Foreground="white" />
+                        <Button
+                            Grid.Column="3"
+                            Width="25"
+                            Height="25"
+                            Margin="0,0,5,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            Content="▶"
+                            Cursor="Hand"
+                            FontSize="17"
+                            FontWeight="Bold"
+                            Foreground="white" />
+                    </Grid>
+                </Border>
+            </Border>
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <ItemsControl Grid.Row="0" ItemsSource="{Binding ActiveTags}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                Margin="4"
+                                Padding="5,2"
+                                Background="#3c3116"
+                                BorderBrush="#af9241"
+                                BorderThickness="1"
+                                CornerRadius="3">
+                                <TextBlock
+                                    FontSize="11"
+                                    Foreground="#af9241"
+                                    Text="{Binding}" />
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Grid.Row="1" Margin="5">
+                    <Run Foreground="#5a5550" Text="Now Playing: " />
+                    <LineBreak />
+                    <Run
+                        FontStyle="Italic"
+                        Foreground="White"
+                        Text="battle music epic.mp3" />
+                </TextBlock>
+            </Grid>
             <Border
                 Grid.Row="2"
-                BorderBrush="gray"
-                BorderThickness="0,1,0,0" />
+                BorderBrush="#3b3734"
+                BorderThickness="0,1,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock
+                        Margin="5,0"
+                        FontSize="20"
+                        Foreground="White"
+                        Text="🔊" />
+                    <Slider
+                        Width="230"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Cursor="SizeWE" />
+                </StackPanel>
+            </Border>
 
         </Grid>
     </Border>

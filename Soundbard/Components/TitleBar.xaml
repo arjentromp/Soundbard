@@ -20,6 +20,7 @@
             Margin="132,0,0,0"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
+            FontFamily="pack://application:,,,/Fonts/#Cinzel"
             FontSize="16"
             Foreground="White"
             Text="SoundBard" />
@@ -52,7 +53,6 @@
                 FontSize="15"
                 Foreground="White"
                 WindowChrome.IsHitTestVisibleInChrome="True" />
-
             <Button
                 x:Name="btnClose"
                 Width="45"
