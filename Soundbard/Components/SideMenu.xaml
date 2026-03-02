@@ -12,27 +12,18 @@
         <Button
             x:Name="btnSave"
             Height="40"
-            Background="Transparent"
-            BorderBrush="Transparent"
             Content="💾"
-            Cursor="Hand"
-            Foreground="White" />
+            Style="{StaticResource SideMenuButton}" />
         <Button
             x:Name="btnLoad"
             Height="40"
-            Background="Transparent"
-            BorderBrush="Transparent"
             Content="📂"
-            Cursor="Hand"
-            Foreground="White" />
+            Style="{StaticResource SideMenuButton}" />
         <Button
             x:Name="btnSettings"
             Height="40"
-            Background="Transparent"
-            BorderBrush="Transparent"
             Content="⚙️"
-            Cursor="Hand"
-            Foreground="White" />
+            Style="{StaticResource SideMenuButton}" />
     </StackPanel>
 
 </UserControl>

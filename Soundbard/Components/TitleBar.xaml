@@ -21,7 +21,7 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             FontFamily="pack://application:,,,/Fonts/#Cinzel"
-            FontSize="16"
+            FontSize="21"
             Foreground="White"
             Text="SoundBard" />
 
@@ -33,37 +33,28 @@
                 x:Name="btnMinimize"
                 Width="45"
                 Height="35"
-                Background="Transparent"
-                BorderBrush="Transparent"
                 Click="btnMinimize_Click"
                 Content="➖"
-                Cursor="Hand"
                 FontSize="15"
-                Foreground="White"
+                Style="{StaticResource TitleBarButton}"
                 WindowChrome.IsHitTestVisibleInChrome="True" />
             <Button
                 x:Name="btnMaximize"
                 Width="45"
                 Height="35"
-                Background="Transparent"
-                BorderBrush="Transparent"
                 Click="btnMaximize_Click"
                 Content="🗖"
-                Cursor="Hand"
                 FontSize="15"
-                Foreground="White"
+                Style="{StaticResource TitleBarButton}"
                 WindowChrome.IsHitTestVisibleInChrome="True" />
             <Button
                 x:Name="btnClose"
                 Width="45"
                 Height="35"
-                Background="Transparent"
-                BorderBrush="Transparent"
                 Click="btnClose_Click"
                 Content="❌"
-                Cursor="Hand"
                 FontSize="15"
-                Foreground="White"
+                Style="{StaticResource TitleBarCloseButton}"
                 WindowChrome.IsHitTestVisibleInChrome="True" />
         </StackPanel>
     </Grid>
