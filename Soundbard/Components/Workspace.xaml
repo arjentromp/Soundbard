@@ -14,28 +14,13 @@
             <local:TrackCard Margin="8" />
             <local:TrackCard Margin="8" />
             <local:TrackCard Margin="8" />
-            <!--  The + button always sits after the last card  -->
-            <Grid
+            <Button
                 Width="280"
                 Height="180"
-                Margin="8">
-                <Rectangle
-                    Fill="Transparent"
-                    RadiusX="10"
-                    RadiusY="10"
-                    Stroke="Orange"
-                    StrokeDashArray="4,3"
-                    StrokeThickness="2" />
-                <Button
-                    VerticalContentAlignment="center"
-                    Background="Transparent"
-                    BorderBrush="Transparent"
-                    Content="+"
-                    Cursor="Hand"
-                    FontSize="50"
-                    FontWeight="Bold"
-                    Foreground="Orange" />
-            </Grid>
+                Margin="8"
+                Content="+"
+                FontSize="28"
+                Style="{StaticResource AddTrackButton}" />
         </WrapPanel>
     </ScrollViewer>
 </UserControl>
