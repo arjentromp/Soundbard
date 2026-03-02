@@ -31,5 +31,7 @@ namespace Soundbard.Components
                 FadeDuration = 2
             };
         }
+
     }
+
 }

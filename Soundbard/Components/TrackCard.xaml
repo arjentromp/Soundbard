@@ -8,6 +8,125 @@
     d:DesignHeight="180"
     d:DesignWidth="280"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="VolumeSlider" TargetType="Slider">
+            <Setter Property="Minimum" Value="0" />
+            <Setter Property="Maximum" Value="100" />
+            <Setter Property="Value" Value="50" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid Height="14" VerticalAlignment="Center">
+                            <!--  Background track  -->
+                            <Border
+                                Height="6"
+                                VerticalAlignment="Center"
+                                Background="#4a4845"
+                                CornerRadius="3" />
+                            <!--  The Track handles all the drag logic  -->
+                            <Track x:Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="Slider.DecreaseLarge">
+                                        <RepeatButton.Style>
+                                            <Style TargetType="RepeatButton">
+                                                <Setter Property="Background" Value="#af9241" />
+                                                <Setter Property="Height" Value="6" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="RepeatButton">
+                                                            <Border Background="{TemplateBinding Background}" CornerRadius="3,0,0,3" />
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </RepeatButton.Style>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Style>
+                                            <Style TargetType="Thumb">
+                                                <Setter Property="Width" Value="14" />
+                                                <Setter Property="Height" Value="14" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Thumb">
+                                                            <Ellipse Fill="#af9241" />
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Thumb.Style>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="Slider.IncreaseLarge">
+                                        <RepeatButton.Style>
+                                            <Style TargetType="RepeatButton">
+                                                <Setter Property="Background" Value="Transparent" />
+                                                <Setter Property="Height" Value="6" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="RepeatButton">
+                                                            <Border Background="Transparent" />
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </RepeatButton.Style>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TrackCardIconButton" TargetType="Button">
+            <Setter Property="Background" Value="#00000000" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="bg"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation
+                                                Storyboard.TargetName="bg"
+                                                Storyboard.TargetProperty="Background.Color"
+                                                To="#3a3835"
+                                                Duration="0:0:0.1" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation
+                                                Storyboard.TargetName="bg"
+                                                Storyboard.TargetProperty="Background.Color"
+                                                To="#00000000"
+                                                Duration="0:0:0.1" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
     <Border
         Width="280"
         Height="180"
@@ -65,32 +184,31 @@
 
                         <Button
                             Grid.Column="2"
-                            Width="13"
-                            Height="30"
-                            Margin="0,0,2,0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            Content="⋮"
-                            Cursor="Hand"
-                            FontSize="20"
-                            FontWeight="Bold"
-                            Foreground="white" />
+                            Width="15"
+                            Height="25"
+                            Margin="0,0,0,0"
+                            Style="{StaticResource TrackCardIconButton}">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="20"
+                                Foreground="White"
+                                Text="⋮" />
+                        </Button>
+
                         <Button
                             Grid.Column="3"
                             Width="25"
                             Height="25"
                             Margin="0,0,5,0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            Content="▶"
-                            Cursor="Hand"
-                            FontSize="17"
-                            FontWeight="Bold"
-                            Foreground="white" />
+                            Style="{StaticResource TrackCardIconButton}">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="20"
+                                Foreground="White"
+                                Text="▶" />
+                        </Button>
                     </Grid>
                 </Border>
             </Border>
@@ -145,9 +263,10 @@
                         Text="🔊" />
                     <Slider
                         Width="230"
-                        HorizontalAlignment="Left"
                         VerticalAlignment="Center"
-                        Cursor="SizeWE" />
+                        Cursor="SizeWE"
+                        IsMoveToPointEnabled="True"
+                        Style="{StaticResource VolumeSlider}" />
                 </StackPanel>
             </Border>
 
