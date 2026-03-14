@@ -258,13 +258,13 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock
                         Margin="5,0"
+                        Cursor="Hand"
                         FontSize="20"
                         Foreground="White"
                         Text="🔊" />
                     <Slider
                         Width="230"
                         VerticalAlignment="Center"
-                        Cursor="SizeWE"
                         IsMoveToPointEnabled="True"
                         Style="{StaticResource VolumeSlider}" />
                 </StackPanel>

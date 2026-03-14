@@ -9,6 +9,7 @@
     Title="MainWindow"
     Width="1500"
     Height="800"
+    Icon="pack://application:,,,/Images/1-66d8bd6a.ico"
     MouseLeftButtonDown="Window_MouseLeftButtonDown"
     SnapsToDevicePixels="True"
     UseLayoutRounding="True"

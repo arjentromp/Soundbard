@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Soundbard.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -21,6 +22,23 @@ namespace Soundbard.Components
         public FolderTree()
         {
             InitializeComponent();
+            DataContext = new FolderTreeViewModel();
+        }
+        private void Header_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var border = sender as Border;
+            var tvi = border?.TemplatedParent as TreeViewItem
+                      ?? FindParent<TreeViewItem>(border);
+            if (tvi != null)
+                tvi.IsExpanded = !tvi.IsExpanded;
+        }
+
+        private T? FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            var parent = VisualTreeHelper.GetParent(child);
+            if (parent == null) return null;
+            if (parent is T match) return match;
+            return FindParent<T>(parent);
         }
     }
 }
