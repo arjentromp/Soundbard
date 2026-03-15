@@ -16,6 +16,7 @@
     <None Remove="Fonts\Cinzel-Regular.ttf" />
     <None Remove="Fonts\Cinzel-SemiBold.ttf" />
     <None Remove="Fonts\Cinzel-VariableFont_wght.ttf" />
+    <None Remove="Images\1-66d8bd6a.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +31,7 @@
     <Resource Include="Fonts\Cinzel-Regular.ttf" />
     <Resource Include="Fonts\Cinzel-SemiBold.ttf" />
     <Resource Include="Fonts\Cinzel-VariableFont_wght.ttf" />
+    <Resource Include="Images\1-66d8bd6a.ico" />
   </ItemGroup>
 
 </Project>
