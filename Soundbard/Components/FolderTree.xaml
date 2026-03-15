@@ -80,15 +80,22 @@
         <TreeView
             x:Name="FolderTreeView"
             Margin="5,5,0,0"
+            AllowDrop="True"
             Background="Transparent"
             BorderBrush="Transparent"
+            DragOver="FolderTree_DragOver"
+            Drop="FolderTree_Drop"
             ItemsSource="{Binding RootNodes}">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                     <Border
                         Padding="4,3"
+                        AllowDrop="True"
                         CornerRadius="3"
-                        MouseLeftButtonUp="Header_MouseLeftButtonUp">
+                        DragOver="Header_DragOver"
+                        Drop="Header_Drop"
+                        MouseLeftButtonUp="Header_MouseLeftButtonUp"
+                        MouseMove="Header_MouseMove">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="Background" Value="Transparent" />

@@ -12,6 +12,8 @@ namespace Soundbard.Components
 {
     public partial class FolderTree : UserControl
     {
+        private FolderNode? _draggedNode;
+
         /// <summary>
         /// Initializes the FolderTree component and sets the DataContext to a new FolderTreeViewModel.
         /// </summary>
@@ -227,6 +229,180 @@ namespace Soundbard.Components
                 if (result != null) return result;
             }
             return null;
+        }
+
+        /// <summary>
+        /// Starts a drag operation when the user holds the mouse button and moves on a tree item.
+        /// </summary>
+        private void Header_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton != MouseButtonState.Pressed) return;
+            if (sender is not Border border) return;
+            if (border.DataContext is not FolderNode node) return;
+
+            _draggedNode = node;
+            DragDrop.DoDragDrop(border, node, DragDropEffects.Move);
+        }
+
+        /// <summary>
+        /// Validates the drag over a target item — only allows dropping onto folders.
+        /// </summary>
+        private void Header_DragOver(object sender, DragEventArgs e)
+        {
+            // Explorer drop — let FolderTree_DragOver handle it
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Handled = false;
+                return;
+            }
+
+            if (sender is not Border border) return;
+            if (border.DataContext is not FolderNode target) return;
+
+            if (_draggedNode == null || _draggedNode == target || !target.IsFolder)
+                e.Effects = DragDropEffects.None;
+            else
+                e.Effects = DragDropEffects.Move;
+
+            e.Handled = true;
+        }
+
+        /// <summary>
+        /// Handles in-app drop by delegating to HandleDrop with move semantics.
+        /// </summary>
+        private void Header_Drop(object sender, DragEventArgs e)
+        {
+            // Explorer drop — let FolderTree_Drop handle it
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Handled = false;
+                return;
+            }
+
+            if (sender is not Border border) return;
+            if (border.DataContext is not FolderNode target || !target.IsFolder) return;
+            if (_draggedNode == null || _draggedNode == target) return;
+
+            HandleDrop(new[] { _draggedNode.FullPath }, target.FullPath, copy: false);
+            _draggedNode = null;
+        }
+
+        private void FolderTree_DragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                var validExtensions = new[] { ".mp3", ".wav", ".ogg", ".flac", ".m4a" };
+                bool hasAudio = files.Any(f => validExtensions.Contains(
+                    Path.GetExtension(f).ToLower()));
+                e.Effects = hasAudio ? DragDropEffects.Copy : DragDropEffects.None;
+            }
+            else if (_draggedNode != null)
+            {
+                e.Effects = DragDropEffects.Move;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+            e.Handled = true;
+        }
+
+        private void FolderTree_Drop(object sender, DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
+            var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            var targetFolder = GetDropTargetFolder(e);
+            HandleDrop(files, targetFolder, copy: true);
+        }
+
+        /// <summary>
+        /// Determines which folder the user dropped onto.
+        /// Falls back to the library root if no folder node is found.
+        /// </summary>
+        private string GetDropTargetFolder(DragEventArgs e)
+        {
+            var element = e.OriginalSource as UIElement;
+            var border = FindParent<Border>(element);
+
+            if (border?.DataContext is FolderNode node)
+                return node.IsFolder ? node.FullPath : Path.GetDirectoryName(node.FullPath)!;
+
+            // Fallback to library root
+            return Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                "Soundbard", "Audio");
+        }
+        /// <summary>
+        /// Shared logic for handling any drop onto the tree.
+        /// copies from Explorer, moves from in-app drag.
+        /// </summary>
+        private void HandleDrop(string[] sourcePaths, string targetFolder, bool copy)
+        {
+            var validExtensions = new[] { ".mp3", ".wav", ".ogg", ".flac", ".m4a" };
+
+            foreach (var sourcePath in sourcePaths)
+            {
+                var ext = Path.GetExtension(sourcePath).ToLower();
+                var isFolder = Directory.Exists(sourcePath);
+
+                if (!isFolder && !validExtensions.Contains(ext)) continue;
+
+                var fileName = Path.GetFileName(sourcePath);
+                var destination = Path.Combine(targetFolder, fileName);
+
+                // Prevent dropping into itself
+                if (isFolder && destination.StartsWith(sourcePath + Path.DirectorySeparatorChar))
+                {
+                    MessageBox.Show("Cannot move a folder into its own subfolder.");
+                    continue;
+                }
+
+                // Handle conflicts
+                bool exists = isFolder ? Directory.Exists(destination) : File.Exists(destination);
+                if (exists && sourcePath != destination)
+                {
+                    var result = MessageBox.Show(
+                        $"'{fileName}' already exists in that folder. Replace it?",
+                        "Conflict", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (result != MessageBoxResult.Yes) continue;
+                }
+
+                try
+                {
+                    if (copy)
+                    {
+                        if (isFolder)
+                            CopyDirectory(sourcePath, destination);
+                        else
+                            File.Copy(sourcePath, destination, overwrite: true);
+                    }
+                    else
+                    {
+                        if (isFolder)
+                            Directory.Move(sourcePath, destination);
+                        else
+                            File.Move(sourcePath, destination, overwrite: true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Could not move '{fileName}': {ex.Message}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Recursively copies a directory and its contents.
+        /// Needed because Directory has no built-in Copy method.
+        /// </summary>
+        private void CopyDirectory(string source, string destination)
+        {
+            Directory.CreateDirectory(destination);
+            foreach (var file in Directory.GetFiles(source))
+                File.Copy(file, Path.Combine(destination, Path.GetFileName(file)), overwrite: true);
+            foreach (var dir in Directory.GetDirectories(source))
+                CopyDirectory(dir, Path.Combine(destination, Path.GetFileName(dir)));
         }
     }
 }

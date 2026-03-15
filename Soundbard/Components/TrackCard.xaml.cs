@@ -23,15 +23,16 @@ namespace Soundbard.Components
         public TrackCard()
         {
             InitializeComponent();
-            DataContext = new TrackViewModel
+            DataContext = new TrackViewModel(new Track
             {
+                Name = "Battle Music",
+                BorderColor = Colors.Red,
                 PlayMode = PlayMode.Continuous,
                 QueueMode = QueueMode.Shuffle,
                 FadeEnabled = true,
                 FadeDuration = 2
-            };
+            });
+
         }
-
     }
-
 }
