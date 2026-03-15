@@ -14,14 +14,89 @@ namespace Soundbard.ViewModels
 
         public ObservableCollection<FolderNode> RootNodes { get; } = new();
 
+        private FileSystemWatcher? _watcher;
+
         //Constructor---------------------------------------------------------------------------------
         public FolderTreeViewModel()
         {
             EnsureLibraryExists();
             LoadTree();
+            StartWatcher();
         }
 
         //Methods-------------------------------------------------------------------------------------
+        /// <summary>
+        /// Start file system watcher to maintain 1:1 between whats on the disk and whats in the app
+        /// </summary>
+        private void StartWatcher()
+        {
+            _watcher = new FileSystemWatcher(GetLibraryPath())
+            {
+                IncludeSubdirectories = true,
+                EnableRaisingEvents = true,
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName
+            };
+
+            _watcher.Created += OnFileSystemChanged;
+            _watcher.Deleted += OnFileSystemChanged;
+            _watcher.Renamed += OnFileSystemChanged;
+        }
+
+        /// <summary>
+        /// Reload tree when a change was detected inside of the audio folder
+        /// </summary>
+        private void OnFileSystemChanged(object sender, FileSystemEventArgs e)
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                if (IsAnyNodeRenaming(RootNodes)) return;
+                var expandedPaths = GetExpandedPaths();
+                LoadTree();
+                RestoreExpandedPaths(expandedPaths);
+            });
+        }
+
+        private bool IsAnyNodeRenaming(IEnumerable<FolderNode> nodes)
+        {
+            foreach (var node in nodes)
+            {
+                if (node.IsRenaming) return true;
+                if (IsAnyNodeRenaming(node.Children)) return true;
+            }
+            return false;
+        }
+
+        private HashSet<string> GetExpandedPaths()
+        {
+            var paths = new HashSet<string>();
+            CollectExpandedPaths(RootNodes, paths);
+            return paths;
+        }
+
+        private void CollectExpandedPaths(IEnumerable<FolderNode> nodes, HashSet<string> paths)
+        {
+            foreach (var node in nodes)
+            {
+                if (node.IsExpanded)
+                    paths.Add(node.FullPath);
+                CollectExpandedPaths(node.Children, paths);
+            }
+        }
+
+        private void RestoreExpandedPaths(HashSet<string> paths)
+        {
+            RestoreExpanded(RootNodes, paths);
+        }
+
+        private void RestoreExpanded(IEnumerable<FolderNode> nodes, HashSet<string> paths)
+        {
+            foreach (var node in nodes)
+            {
+                if (paths.Contains(node.FullPath))
+                    node.IsExpanded = true;
+                RestoreExpanded(node.Children, paths);
+            }
+        }
 
         /// <summary>
         /// Returns the root library path.
@@ -44,7 +119,7 @@ namespace Soundbard.ViewModels
         /// <summary>
         /// Loads the folder tree from the disk.
         /// </summary>
-        private void LoadTree()
+        public void LoadTree()
         {
             RootNodes.Clear();
             var root = BuildNode(GetLibraryPath());
@@ -63,19 +138,19 @@ namespace Soundbard.ViewModels
                 IsFolder = true
             };
 
-            foreach (var dir in Directory.GetDirectories(path))
-                node.Children.Add(BuildNode(dir));
-
-            foreach (var file in Directory.GetFiles(path)
-                .Where(f => AudioExtensions.Contains(Path.GetExtension(f).ToLower())))
+            foreach (var file in Directory.GetFiles(path).Where(f => AudioExtensions.Contains(Path.GetExtension(f).ToLower())))
             {
                 node.Children.Add(new FolderNode
                 {
-                    Name = Path.GetFileName(file),
+                    Name = Path.GetFileNameWithoutExtension(file),
+                    OriginalName = Path.GetFileNameWithoutExtension(file),
                     FullPath = file,
                     IsFolder = false
                 });
             }
+
+            foreach (var dir in Directory.GetDirectories(path))
+                node.Children.Add(BuildNode(dir));
 
             return node;
         }

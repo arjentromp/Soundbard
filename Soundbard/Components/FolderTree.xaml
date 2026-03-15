@@ -9,9 +9,53 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
     <UserControl.Resources>
+        <Style TargetType="ContextMenu">
+            <Setter Property="Background" Value="#1f1d1b" />
+            <Setter Property="BorderBrush" Value="#3b3734" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HasDropShadow" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4">
+                            <ItemsPresenter />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="MenuItem">
+            <Setter Property="Background" Value="#1f1d1b" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border
+                            x:Name="border"
+                            Padding="12,6"
+                            Background="{TemplateBinding Background}"
+                            Cursor="Hand">
+                            <ContentPresenter ContentSource="Header" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#3c3116" />
+                                <Setter Property="Foreground" Value="#af9241" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style TargetType="TreeViewItem">
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TreeViewItem">
@@ -34,6 +78,7 @@
     </UserControl.Resources>
     <Grid Background="#262422">
         <TreeView
+            x:Name="FolderTreeView"
             Margin="5,5,0,0"
             Background="Transparent"
             BorderBrush="Transparent"
@@ -49,17 +94,51 @@
                                 <Setter Property="Background" Value="Transparent" />
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#383633" />
+                                        <Setter Property="Background" Value="#2c2a27" />
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
                         </Border.Style>
+                        <Border.ContextMenu>
+                            <ContextMenu>
+                                <ContextMenu.Style>
+                                    <Style TargetType="ContextMenu">
+                                        <Setter Property="Background" Value="#1f1d1b" />
+                                        <Setter Property="BorderBrush" Value="#3b3734" />
+                                        <Setter Property="Foreground" Value="White" />
+                                    </Style>
+                                </ContextMenu.Style>
+                                <MenuItem
+                                    Click="Rename_Click"
+                                    Header="Rename"
+                                    Tag="{Binding}" />
+                                <MenuItem
+                                    Click="CreateFolder_Click"
+                                    Header="New Folder"
+                                    Tag="{Binding}">
+                                    <MenuItem.Style>
+                                        <Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="MenuItem">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsFolder}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </MenuItem.Style>
+                                </MenuItem>
+                                <MenuItem
+                                    Click="Delete_Click"
+                                    Header="Delete"
+                                    Tag="{Binding}" />
+                            </ContextMenu>
+                        </Border.ContextMenu>
                         <StackPanel Orientation="Horizontal">
+                            <!--  Chevron  -->
                             <TextBlock
                                 Width="14"
                                 VerticalAlignment="Center"
                                 FontSize="12"
-                                Foreground="White"
+                                Foreground="#7a7060"
                                 RenderTransformOrigin="0.5,0.5">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
@@ -80,6 +159,7 @@
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
+                            <!--  Icon  -->
                             <TextBlock
                                 Margin="0,0,4,0"
                                 VerticalAlignment="Center"
@@ -96,10 +176,45 @@
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
+                            <!--  Name display — hidden during rename  -->
                             <TextBlock
+                                VerticalAlignment="Center"
                                 FontSize="15"
                                 Foreground="White"
-                                Text="{Binding Name}" />
+                                Text="{Binding Name}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsRenaming}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <!--  Rename input — shown during rename  -->
+                            <TextBox
+                                x:Name="RenameBox"
+                                MinWidth="100"
+                                Background="#1f1d1b"
+                                BorderBrush="#af9241"
+                                FontSize="15"
+                                Foreground="White"
+                                IsVisibleChanged="RenameBox_IsVisibleChanged"
+                                KeyDown="RenameBox_KeyDown"
+                                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsRenaming}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
                         </StackPanel>
                     </Border>
                 </HierarchicalDataTemplate>
