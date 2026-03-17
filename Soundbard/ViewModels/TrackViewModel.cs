@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Soundbard.Models;
+using Soundbard.Commands;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Soundbard.ViewModels
@@ -10,10 +12,12 @@ namespace Soundbard.ViewModels
     public class TrackViewModel : BaseViewModel
     {
         private readonly Track _track;
+        private readonly WorkspaceViewModel _workspace;
 
-        public TrackViewModel(Track track)
+        public TrackViewModel(Track track, WorkspaceViewModel workspace)
         {
             _track = track;
+            _workspace = workspace;
         }
 
         // --- Passthrough properties to the model ---
@@ -123,11 +127,15 @@ namespace Soundbard.ViewModels
                 if (IntervalEnabled)
                 {
                     tags.Add($"Interval {IntervalSeconds}s");
-                    if (IntervalRandom) tags.Add($"±{IntervalDeviation}s");
+                    tags.Add($"Deviation {IntervalDeviation}s");
                 }
                 return tags;
             }
         }
+
+        // --- Commands ---
+
+        public ICommand DeleteCommand => new RelayCommand(() => _workspace.DeleteTrack(this));
 
         // --- Expose the underlying model for saving ---
 

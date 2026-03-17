@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Soundbard.Commands;
+﻿using Soundbard.Commands;
 using Soundbard.Models;
+using Soundbard.Views;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text;
 using System.Windows.Input;
+using System.Windows;
 
 namespace Soundbard.ViewModels
 {
@@ -13,25 +15,24 @@ namespace Soundbard.ViewModels
         private readonly ObservableCollection<object> _items = new();
         public ObservableCollection<object> Items => _items;
 
-        public ICommand AddTrackCommand => new RelayCommand(OpenAddTrackDialog);
+        public ICommand AddTrackCommand => new RelayCommand(OpenTrackOptionsDialog);
 
         public WorkspaceViewModel()
         {
             _items.Add(new AddTrackPlaceholder());
         }
 
-        private void OpenAddTrackDialog()
+        public void DeleteTrack(TrackViewModel track)
         {
-            var newTrack = new TrackViewModel(new Track
-            {
-                Name = "New Track",
-                BorderColor = System.Windows.Media.Colors.Red,
-                PlayMode = PlayMode.Continuous,
-                QueueMode = QueueMode.Shuffle
-            });
+            _items.Remove(track);
+        }
 
-            // Insert before the placeholder
-            _items.Insert(_items.Count - 1, newTrack);
+        private void OpenTrackOptionsDialog()
+        {
+            var dialog = new TrackOptionsDialog();
+            dialog.Owner = Application.Current.MainWindow;
+            if (dialog.ShowDialog() == true && dialog.Result != null)
+                _items.Insert(_items.Count - 1, new TrackViewModel(dialog.Result, this));
         }
     }
 }

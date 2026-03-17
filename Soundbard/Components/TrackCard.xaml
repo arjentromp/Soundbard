@@ -127,13 +127,35 @@
             </Setter>
         </Style>
     </UserControl.Resources>
+    <!--  End of resources  -->
     <Border
         Width="280"
         Height="180"
+        AllowDrop="True"
         Background="#262422"
-        BorderBrush="red"
+        BorderBrush="{Binding BorderBrush}"
         BorderThickness="2"
-        CornerRadius="10">
+        CornerRadius="10"
+        DragOver="TrackCard_DragOver"
+        Drop="TrackCard_Drop">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                        <Setter Property="Effect">
+                            <Setter.Value>
+                                <DropShadowEffect
+                                    BlurRadius="25"
+                                    Direction="0"
+                                    Opacity="0.8"
+                                    ShadowDepth="0"
+                                    Color="{Binding BorderColor}" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="4*" />
@@ -170,7 +192,7 @@
                                 VerticalAlignment="Center"
                                 FontSize="15"
                                 Foreground="White"
-                                Text="F3" />
+                                Text="{Binding Hotkey}" />
                         </Border>
 
                         <TextBlock
@@ -180,14 +202,21 @@
                             FontFamily="pack://application:,,,/Fonts/#Cinzel"
                             FontSize="26"
                             Foreground="White"
-                            Text="Battle Music" />
+                            Text="{Binding Name}" />
 
                         <Button
                             Grid.Column="2"
                             Width="15"
                             Height="25"
                             Margin="0,0,0,0"
+                            Click="OptionsButton_Click"
                             Style="{StaticResource TrackCardIconButton}">
+                            <Button.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Click="Edit_Click" Header="Edit" />
+                                    <MenuItem Click="Delete_Click" Header="Delete" />
+                                </ContextMenu>
+                            </Button.ContextMenu>
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
@@ -266,7 +295,8 @@
                         Width="230"
                         VerticalAlignment="Center"
                         IsMoveToPointEnabled="True"
-                        Style="{StaticResource VolumeSlider}" />
+                        Style="{StaticResource VolumeSlider}"
+                        Value="75" />
                 </StackPanel>
             </Border>
 
