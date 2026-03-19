@@ -42,9 +42,10 @@
                 x:Name="btnMaximize"
                 Width="45"
                 Height="35"
+                Padding="0,-2,0,0"
                 Click="btnMaximize_Click"
                 Content="🗖"
-                FontSize="15"
+                FontSize="18"
                 Style="{StaticResource TitleBarButton}"
                 WindowChrome.IsHitTestVisibleInChrome="True" />
             <Button

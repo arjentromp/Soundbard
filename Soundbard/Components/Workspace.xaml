@@ -8,19 +8,36 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <local:TrackDataTemplateSelector x:Key="TrackSelector">
+            <local:TrackDataTemplateSelector.TrackTemplate>
+                <DataTemplate>
+                    <local:TrackCard Margin="8" DataContext="{Binding}" />
+                </DataTemplate>
+            </local:TrackDataTemplateSelector.TrackTemplate>
+            <local:TrackDataTemplateSelector.AddButtonTemplate>
+                <DataTemplate>
+                    <Button
+                        Width="280"
+                        Height="180"
+                        Margin="8"
+                        Command="{Binding DataContext.AddTrackCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                        Content="+"
+                        FontSize="28"
+                        Style="{StaticResource AddTrackButton}" />
+                </DataTemplate>
+            </local:TrackDataTemplateSelector.AddButtonTemplate>
+        </local:TrackDataTemplateSelector>
+    </UserControl.Resources>
+
     <ScrollViewer Background="#302E2B" VerticalScrollBarVisibility="Auto">
-        <WrapPanel Margin="10" Orientation="Horizontal">
-            <!--  Hardcoded track cards for now  -->
-            <local:TrackCard Margin="8" />
-            <local:TrackCard Margin="8" />
-            <local:TrackCard Margin="8" />
-            <Button
-                Width="280"
-                Height="180"
-                Margin="8"
-                Content="+"
-                FontSize="28"
-                Style="{StaticResource AddTrackButton}" />
-        </WrapPanel>
+        <ItemsControl ItemTemplateSelector="{StaticResource TrackSelector}" ItemsSource="{Binding Items}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Margin="10" Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
     </ScrollViewer>
 </UserControl>
