@@ -241,7 +241,7 @@ namespace Soundbard.Components
             if (border.DataContext is not FolderNode node) return;
 
             _draggedNode = node;
-            DragDrop.DoDragDrop(border, node, DragDropEffects.Move);
+            DragDrop.DoDragDrop(border, node, DragDropEffects.Move | DragDropEffects.Copy);
         }
 
         /// <summary>
