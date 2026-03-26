@@ -7,7 +7,6 @@ namespace Soundbard.Models
     public enum QueueMode
     {
         Shuffle,
-        Sequential,
-        Custom
+        Sequential
     }
 }

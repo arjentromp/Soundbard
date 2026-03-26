@@ -401,7 +401,6 @@
                         IsEnabled="False" />
                     <ComboBoxItem Content="Shuffle" />
                     <ComboBoxItem Content="Sequential" />
-                    <ComboBoxItem Content="Custom" />
                 </ComboBox>
                 <!--  Fade  -->
                 <TextBlock

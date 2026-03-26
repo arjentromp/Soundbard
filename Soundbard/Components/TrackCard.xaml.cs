@@ -75,6 +75,18 @@ namespace Soundbard.Components
             }
         }
 
+        /// <summary>
+        /// Opens the Manage audio window
+        /// </summary>
+        private void Manage_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is not TrackViewModel vm) return;
+
+            var dialog = new ManageAudioDialog(vm);
+            dialog.Owner = Application.Current.MainWindow;
+            dialog.ShowDialog();
+        }
+
         private void TrackCard_DragOver(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(FolderNode)))

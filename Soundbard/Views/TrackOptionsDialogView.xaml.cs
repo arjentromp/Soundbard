@@ -101,7 +101,6 @@ namespace Soundbard.Views
                 {
                     1 => QueueMode.Shuffle,
                     2 => QueueMode.Sequential,
-                    3 => QueueMode.Custom,
                     _ => QueueMode.Shuffle
                 },
                 FadeEnabled = FadeEnabledBox.IsChecked == true,
@@ -148,7 +147,6 @@ namespace Soundbard.Views
             {
                 QueueMode.Shuffle => 1,
                 QueueMode.Sequential => 2,
-                QueueMode.Custom => 3,
                 _ => 0
             };
 

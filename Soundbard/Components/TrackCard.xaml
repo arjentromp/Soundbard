@@ -214,6 +214,7 @@
                             <Button.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Click="Edit_Click" Header="Edit" />
+                                    <MenuItem Click="Manage_Click" Header="Manage audio" />
                                     <MenuItem Click="Delete_Click" Header="Delete" />
                                 </ContextMenu>
                             </Button.ContextMenu>
