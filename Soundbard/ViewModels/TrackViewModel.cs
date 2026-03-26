@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Soundbard.Commands;
 using Soundbard.Models;
-using Soundbard.Commands;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -140,5 +137,24 @@ namespace Soundbard.ViewModels
         // --- Expose the underlying model for saving ---
 
         public Track GetModel() => _track;
+
+        public void MoveUp(string filePath)
+        {
+            var index = FilePaths.IndexOf(filePath);
+            if (index <= 0) return;
+            FilePaths.Move(index, index - 1);
+        }
+
+        public void MoveDown(string filePath)
+        {
+            var index = FilePaths.IndexOf(filePath);
+            if (index < 0 || index >= FilePaths.Count - 1) return;
+            FilePaths.Move(index, index + 1);
+        }
+
+        public void RemoveFile(string filePath)
+        {
+            FilePaths.Remove(filePath);
+        }
     }
 }
