@@ -18,9 +18,7 @@ namespace Soundbard.Models
         public bool FadeEnabled { get; set; } = false;
         public int FadeDuration { get; set; } = 2;
 
-        public bool IntervalEnabled { get; set; } = false;
         public int IntervalSeconds { get; set; } = 30;
-        public bool IntervalRandom { get; set; } = false;
         public int IntervalDeviation { get; set; } = 10;
 
         public int Volume { get; set; } = 100;

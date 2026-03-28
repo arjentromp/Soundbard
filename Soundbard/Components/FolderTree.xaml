@@ -85,7 +85,8 @@
             BorderBrush="Transparent"
             DragOver="FolderTree_DragOver"
             Drop="FolderTree_Drop"
-            ItemsSource="{Binding RootNodes}">
+            ItemsSource="{Binding RootNodes}"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                     <Border

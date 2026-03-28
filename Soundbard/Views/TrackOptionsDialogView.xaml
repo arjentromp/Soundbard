@@ -402,6 +402,36 @@
                     <ComboBoxItem Content="Shuffle" />
                     <ComboBoxItem Content="Sequential" />
                 </ComboBox>
+                <TextBlock
+                    Margin="0,12,0,4"
+                    FontSize="14"
+                    Foreground="White"
+                    Text="Interval" />
+                <!--  Interval  -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBox
+                        x:Name="IntervalDurationBox"
+                        Width="60"
+                        Padding="3"
+                        Text="2" />
+                    <TextBlock
+                        Margin="8,0,8,0"
+                        VerticalAlignment="Center"
+                        FontSize="12"
+                        Foreground="#7a7060"
+                        Text="seconds" />
+                    <TextBox
+                        x:Name="IntervalDeviationBox"
+                        Width="60"
+                        Padding="3"
+                        Text="2" />
+                    <TextBlock
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center"
+                        FontSize="12"
+                        Foreground="#7a7060"
+                        Text="Deviation" />
+                </StackPanel>
                 <!--  Fade  -->
                 <TextBlock
                     Margin="0,12,0,4"
@@ -425,40 +455,6 @@
                         FontSize="12"
                         Foreground="#7a7060"
                         Text="seconds" />
-                </StackPanel>
-                <TextBlock
-                    Margin="0,12,0,4"
-                    FontSize="14"
-                    Foreground="White"
-                    Text="Interval" />
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox
-                        x:Name="IntervalEnabledBox"
-                        Margin="0,0,16,0"
-                        VerticalAlignment="Center"
-                        Foreground="White" />
-                    <TextBox
-                        x:Name="IntervalDurationBox"
-                        Width="60"
-                        Padding="3"
-                        Text="2" />
-                    <TextBlock
-                        Margin="8,0,8,0"
-                        VerticalAlignment="Center"
-                        FontSize="12"
-                        Foreground="#7a7060"
-                        Text="seconds" />
-                    <TextBox
-                        x:Name="IntervalDeviationBox"
-                        Width="60"
-                        Padding="3"
-                        Text="2" />
-                    <TextBlock
-                        Margin="8,0,0,0"
-                        VerticalAlignment="Center"
-                        FontSize="12"
-                        Foreground="#7a7060"
-                        Text="Deviation" />
                 </StackPanel>
             </StackPanel>
 

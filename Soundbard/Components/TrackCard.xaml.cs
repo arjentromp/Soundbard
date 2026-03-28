@@ -69,7 +69,6 @@ namespace Soundbard.Components
                 vm.QueueMode = dialog.Result.QueueMode;
                 vm.FadeEnabled = dialog.Result.FadeEnabled;
                 vm.FadeDuration = dialog.Result.FadeDuration;
-                vm.IntervalEnabled = dialog.Result.IntervalEnabled;
                 vm.IntervalSeconds = dialog.Result.IntervalSeconds;
                 vm.IntervalDeviation = dialog.Result.IntervalDeviation;
             }

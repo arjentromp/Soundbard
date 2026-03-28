@@ -1,5 +1,6 @@
 ﻿using Soundbard.Commands;
 using Soundbard.Models;
+using Soundbard.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -10,93 +11,128 @@ namespace Soundbard.ViewModels
     {
         private readonly Track _track;
         private readonly WorkspaceViewModel _workspace;
+        private readonly AudioService _audioService;
 
+        /// <summary>
+        /// Initializes the TrackViewModel with its underlying model, parent workspace,
+        /// and a new AudioService instance for handling playback.
+        /// </summary>
         public TrackViewModel(Track track, WorkspaceViewModel workspace)
         {
             _track = track;
             _workspace = workspace;
+            _audioService = new AudioService(FilePaths);
         }
 
-        // --- Passthrough properties to the model ---
+        // --- Track properties ---
 
+        /// <summary>
+        /// The display name of the track.
+        /// </summary>
         public string Name
         {
             get => _track.Name;
             set { _track.Name = value; OnPropertyChanged(); }
         }
 
+        /// <summary>
+        /// The keyboard hotkey assigned to this track.
+        /// </summary>
         public string Hotkey
         {
             get => _track.Hotkey;
             set { _track.Hotkey = value; OnPropertyChanged(); }
         }
 
+        /// <summary>
+        /// The border color of the track card.
+        /// </summary>
         public Color BorderColor
         {
             get => _track.BorderColor;
             set { _track.BorderColor = value; OnPropertyChanged(); OnPropertyChanged(nameof(BorderBrush)); }
         }
 
+        /// <summary>
+        /// A SolidColorBrush derived from BorderColor, used for XAML binding.
+        /// </summary>
         public SolidColorBrush BorderBrush => new SolidColorBrush(_track.BorderColor);
 
-        public PlayMode PlayMode
-        {
-            get => _track.PlayMode;
-            set { _track.PlayMode = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
-        }
-
-        public QueueMode QueueMode
-        {
-            get => _track.QueueMode;
-            set { _track.QueueMode = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
-        }
-
-        public bool FadeEnabled
-        {
-            get => _track.FadeEnabled;
-            set { _track.FadeEnabled = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
-        }
-
-        public int FadeDuration
-        {
-            get => _track.FadeDuration;
-            set { _track.FadeDuration = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
-        }
-
-        public bool IntervalEnabled
-        {
-            get => _track.IntervalEnabled;
-            set { _track.IntervalEnabled = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
-        }
-
-        public int IntervalSeconds
-        {
-            get => _track.IntervalSeconds;
-            set { _track.IntervalSeconds = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
-        }
-
-        public bool IntervalRandom
-        {
-            get => _track.IntervalRandom;
-            set { _track.IntervalRandom = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
-        }
-
-        public int IntervalDeviation
-        {
-            get => _track.IntervalDeviation;
-            set { _track.IntervalDeviation = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
-        }
-
+        /// <summary>
+        /// The volume level of the track (0-100).
+        /// </summary>
         public int Volume
         {
             get => _track.Volume;
             set { _track.Volume = value; OnPropertyChanged(); }
         }
 
+        /// <summary>
+        /// The list of file paths associated with this track.
+        /// </summary>
         public ObservableCollection<string> FilePaths => _track.FilePaths;
 
-        // --- Runtime only properties, never saved ---
+        // --- Playback settings ---
 
+        /// <summary>
+        /// Determines how the track behaves when playing (Continuous, Manual, Interval).
+        /// </summary>
+        public PlayMode PlayMode
+        {
+            get => _track.PlayMode;
+            set { _track.PlayMode = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
+        }
+
+        /// <summary>
+        /// Determines the order files are played (Shuffle, Sequential).
+        /// </summary>
+        public QueueMode QueueMode
+        {
+            get => _track.QueueMode;
+            set { _track.QueueMode = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
+        }
+
+        /// <summary>
+        /// Whether fade in/out is enabled for this track.
+        /// </summary>
+        public bool FadeEnabled
+        {
+            get => _track.FadeEnabled;
+            set { _track.FadeEnabled = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
+        }
+
+        /// <summary>
+        /// The duration of the fade effect in seconds.
+        /// </summary>
+        public int FadeDuration
+        {
+            get => _track.FadeDuration;
+            set { _track.FadeDuration = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
+        }
+
+        /// <summary>
+        /// The base interval duration in seconds between plays.
+        /// </summary>
+        public int IntervalSeconds
+        {
+            get => _track.IntervalSeconds;
+            set { _track.IntervalSeconds = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
+        }
+
+        /// <summary>
+        /// The maximum random deviation added to the interval in seconds.
+        /// </summary>
+        public int IntervalDeviation
+        {
+            get => _track.IntervalDeviation;
+            set { _track.IntervalDeviation = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActiveTags)); }
+        }
+
+        // --- Runtime state ---
+
+        /// <summary>
+        /// Whether the track is currently playing. Not persisted.
+        /// </summary>
         private bool _isPlaying;
         public bool IsPlaying
         {
@@ -104,6 +140,9 @@ namespace Soundbard.ViewModels
             set { _isPlaying = value; OnPropertyChanged(); }
         }
 
+        /// <summary>
+        /// The filename currently being played. Not persisted.
+        /// </summary>
         private string _currentFileName = string.Empty;
         public string CurrentFileName
         {
@@ -113,6 +152,9 @@ namespace Soundbard.ViewModels
 
         // --- Computed properties ---
 
+        /// <summary>
+        /// A collection of active setting tags displayed on the track card.
+        /// </summary>
         public ObservableCollection<string> ActiveTags
         {
             get
@@ -121,7 +163,7 @@ namespace Soundbard.ViewModels
                 tags.Add(PlayMode.ToString());
                 tags.Add(QueueMode.ToString());
                 if (FadeEnabled) tags.Add($"Fade {FadeDuration}s");
-                if (IntervalEnabled)
+                if (PlayMode == PlayMode.Interval)
                 {
                     tags.Add($"Interval {IntervalSeconds}s");
                     tags.Add($"Deviation {IntervalDeviation}s");
@@ -132,12 +174,21 @@ namespace Soundbard.ViewModels
 
         // --- Commands ---
 
+        /// <summary>
+        /// Removes this track from the workspace.
+        /// </summary>
         public ICommand DeleteCommand => new RelayCommand(() => _workspace.DeleteTrack(this));
 
-        // --- Expose the underlying model for saving ---
+        /// <summary>
+        /// Toggles playback on this track between playing and paused.
+        /// </summary>
+        public ICommand PlayPauseCommand => new RelayCommand(() => _audioService.PlayPause());
 
-        public Track GetModel() => _track;
+        // --- File management ---
 
+        /// <summary>
+        /// Moves the specified file one position up in the FilePaths list.
+        /// </summary>
         public void MoveUp(string filePath)
         {
             var index = FilePaths.IndexOf(filePath);
@@ -145,6 +196,9 @@ namespace Soundbard.ViewModels
             FilePaths.Move(index, index - 1);
         }
 
+        /// <summary>
+        /// Moves the specified file one position down in the FilePaths list.
+        /// </summary>
         public void MoveDown(string filePath)
         {
             var index = FilePaths.IndexOf(filePath);
@@ -152,9 +206,19 @@ namespace Soundbard.ViewModels
             FilePaths.Move(index, index + 1);
         }
 
+        /// <summary>
+        /// Removes the specified file from the FilePaths list.
+        /// </summary>
         public void RemoveFile(string filePath)
         {
             FilePaths.Remove(filePath);
         }
+
+        // --- Model access ---
+
+        /// <summary>
+        /// Returns the underlying Track model, used for serialization.
+        /// </summary>
+        public Track GetModel() => _track;
     }
 }
