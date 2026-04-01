@@ -1,6 +1,7 @@
 ﻿using Soundbard.Models;
 using System;
 using System.Collections.ObjectModel;
+using System.Drawing.Text;
 using System.IO;
 using System.Windows.Media;
 
@@ -13,16 +14,62 @@ namespace Soundbard.Services
     public class AudioService
     {
         private readonly MediaPlayer _player;
+        private readonly Track _track;
         private readonly ObservableCollection<string> _filePaths;
         private bool _isPlaying;
 
-        /// <summary>
-        /// Initializes the AudioService with the track's file list.
-        /// </summary>
-        public AudioService(ObservableCollection<string> filePaths)
+        public event Action<bool>? PlayingChanged;
+        public event Action<string>? FileChanged;
+
+        public AudioService(Track track)
         {
             _player = new MediaPlayer();
-            _filePaths = filePaths;
+            _track = track;
+            _filePaths = track.FilePaths;
+
+            _player.MediaEnded += OnMediaEnded;
+        }
+
+        /// <summary>
+        /// Loads an audio file for the MediaPlayer
+        /// </summary>
+        private string? _currentFile;
+
+        public void Load(string filePath)
+        {
+            if (_currentFile == filePath) return;
+
+            _player.Open(new Uri(filePath));
+            _currentFile = filePath;
+
+            FileChanged?.Invoke(Path.GetFileNameWithoutExtension(filePath));
+        }
+
+        private int _currentIndex = -1;
+
+        /// <summary>
+        /// Checks what the QueueMode is set to and picks a file based on it.
+        /// </summary>
+        private string? GetNextFile()
+        {
+            if (_filePaths.Count == 0) return null;
+
+            if (_track.QueueMode == QueueMode.Sequential)
+            {
+                _currentIndex++;
+
+                if (_currentIndex >= _filePaths.Count)
+                {
+                    _currentIndex = 0;
+                }
+
+                return _filePaths[_currentIndex];
+            }
+            else
+            {
+                // shuffle logic later
+                return null;
+            }
         }
 
         /// <summary>
@@ -30,19 +77,39 @@ namespace Soundbard.Services
         /// </summary>
         public void PlayPause()
         {
-            if (_filePaths.Count == 0) return;
+            if (_currentFile == null && _filePaths.Count > 0)
+            {
+                var next = GetNextFile();
+                if (next != null)
+                {
+                    Load(next);
+                }
+            }
+
+            if (_currentFile == null) return;
 
             if (_isPlaying)
             {
                 _player.Pause();
                 _isPlaying = false;
+                PlayingChanged?.Invoke(false);
             }
             else
             {
-                _player.Open(new Uri(_filePaths[0]));
                 _player.Play();
                 _isPlaying = true;
+                PlayingChanged?.Invoke(true);
             }
+        }
+
+        /// <summary>
+        /// Sets the volume to the slider.
+        /// </summary>
+        public void SetVolume(int volume)
+        {
+            volume = Math.Max(0, Math.Min(100, volume));
+
+            _player.Volume = volume / 100.0;
         }
 
         /// <summary>
@@ -51,7 +118,59 @@ namespace Soundbard.Services
         public void Stop()
         {
             _player.Stop();
+            HandlePlaybackStopped();
+        }
+
+        /// <summary>
+        /// When OnMediaEnded event fires, decide which action to take
+        /// </summary>
+        private void OnMediaEnded(object? sender, EventArgs e)
+        {
+            switch (_track.PlayMode)
+            {
+                case PlayMode.Continuous:
+                    var nextContinuous = GetNextFile();
+                    if (nextContinuous != null)
+                    {
+                        Load(nextContinuous);
+                        _player.Play();
+
+                        _isPlaying = true;
+                        PlayingChanged?.Invoke(true);
+                    }
+                    else
+                    {
+                        HandlePlaybackStopped();
+                    }
+                    break;
+
+                case PlayMode.Manual:
+                    HandlePlaybackStopped();
+
+                    var nextManual = GetNextFile();
+                    if (nextManual != null)
+                    {
+                        Load(nextManual);
+                    }
+
+
+                    break;
+
+                case PlayMode.Interval:
+                    // future logic
+                    HandlePlaybackStopped();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Sets the track IsPlaying to false
+        /// </summary>
+        private void HandlePlaybackStopped()
+        {
+            _player.Stop();
             _isPlaying = false;
+            PlayingChanged?.Invoke(false);
         }
     }
 }

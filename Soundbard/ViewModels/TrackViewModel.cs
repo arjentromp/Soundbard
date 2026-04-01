@@ -21,7 +21,11 @@ namespace Soundbard.ViewModels
         {
             _track = track;
             _workspace = workspace;
-            _audioService = new AudioService(FilePaths);
+
+            _audioService = new AudioService(_track);
+
+            _audioService.PlayingChanged += isPlaying => IsPlaying = isPlaying;
+            _audioService.FileChanged += fileName => CurrentFileName = fileName;
         }
 
         // --- Track properties ---
@@ -64,7 +68,13 @@ namespace Soundbard.ViewModels
         public int Volume
         {
             get => _track.Volume;
-            set { _track.Volume = value; OnPropertyChanged(); }
+            set
+            {
+                _track.Volume = value;
+                OnPropertyChanged();
+
+                _audioService.SetVolume(value);
+            }
         }
 
         /// <summary>
