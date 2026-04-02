@@ -16,6 +16,7 @@ namespace Soundbard.Services
         private readonly MediaPlayer _player;
         private readonly Track _track;
         private readonly ObservableCollection<string> _filePaths;
+        private readonly Random _random = new Random();
         private bool _isPlaying;
 
         public event Action<bool>? PlayingChanged;
@@ -67,15 +68,28 @@ namespace Soundbard.Services
             }
             else
             {
-                // shuffle logic later
-                return null;
+                int index;
+                if (_filePaths.Count == 1)
+                {
+                    return _filePaths[0];
+                }
+
+                do
+                {
+                    index = _random.Next(0, _filePaths.Count);
+                }
+                while (index == _currentIndex);
+
+                _currentIndex = index;
+
+                return _filePaths[index];
             }
         }
 
         /// <summary>
-        /// Toggles between playing and pausing. Plays the first file if nothing is loaded yet.
+        /// Checks if a file is loaded, if not, it loads the next file.
         /// </summary>
-        public void PlayPause()
+        private void EnsureFileLoaded()
         {
             if (_currentFile == null && _filePaths.Count > 0)
             {
@@ -85,6 +99,14 @@ namespace Soundbard.Services
                     Load(next);
                 }
             }
+        }
+
+        /// <summary>
+        /// Toggles between playing and pausing.
+        /// </summary>
+        public void PlayPause()
+        {
+            EnsureFileLoaded();
 
             if (_currentFile == null) return;
 
