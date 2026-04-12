@@ -185,9 +185,13 @@ namespace Soundbard.ViewModels
         // --- Commands ---
 
         /// <summary>
-        /// Removes this track from the workspace.
+        /// Removes this track from the workspace and disposes of its child MediaPlayer
         /// </summary>
-        public ICommand DeleteCommand => new RelayCommand(() => _workspace.DeleteTrack(this));
+        public ICommand DeleteCommand => new RelayCommand(() =>
+        {
+            _audioService.Dispose();
+            _workspace.DeleteTrack(this);
+        });
 
         /// <summary>
         /// Toggles playback on this track between playing and paused.

@@ -1,55 +1,61 @@
 ﻿using Soundbard.Models;
 using System;
 using System.Collections.ObjectModel;
-using System.Drawing.Text;
 using System.IO;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Soundbard.Services
 {
-    /// <summary>
-    /// Handles all audio playback logic for a single track.
-    /// Each TrackViewModel owns one instance of this service.
-    /// </summary>
     public class AudioService
     {
-        private readonly MediaPlayer _player;
+        private MediaPlayer _currentPlayer;
+        private MediaPlayer _nextPlayer;
+        private DispatcherTimer? _fadeTimer;
+
         private readonly Track _track;
         private readonly ObservableCollection<string> _filePaths;
         private readonly Random _random = new Random();
+        private DispatcherTimer? _intervalTimer;
+        private DateTime _nextTriggerTime;
+
+        private int _currentIndex = -1;
+        private string? _currentFile;
         private bool _isPlaying;
+        private double _fadeProgress;
 
         public event Action<bool>? PlayingChanged;
         public event Action<string>? FileChanged;
 
         public AudioService(Track track)
         {
-            _player = new MediaPlayer();
             _track = track;
             _filePaths = track.FilePaths;
 
-            _player.MediaEnded += OnMediaEnded;
+            _currentPlayer = new MediaPlayer();
+            _nextPlayer = new MediaPlayer();
+
+            _currentPlayer.MediaEnded += OnMediaEnded;
         }
 
         /// <summary>
-        /// Loads an audio file for the MediaPlayer
+        /// Loads a file into a specific player.
+        /// Only updates UI when loading into current player.
         /// </summary>
-        private string? _currentFile;
-
-        public void Load(string filePath)
+        private void Load(MediaPlayer player, string filePath)
         {
-            if (_currentFile == filePath) return;
+            player.Open(new Uri(filePath));
 
-            _player.Open(new Uri(filePath));
-            _currentFile = filePath;
-
-            FileChanged?.Invoke(Path.GetFileNameWithoutExtension(filePath));
+            if (player == _currentPlayer)
+            {
+                _currentFile = filePath;
+                FileChanged?.Invoke(Path.GetFileNameWithoutExtension(filePath));
+            }
         }
 
-        private int _currentIndex = -1;
-
         /// <summary>
-        /// Checks what the QueueMode is set to and picks a file based on it.
+        /// Returns the next file AND advances the index.
+        /// This is ONLY used by Preload().
         /// </summary>
         private string? GetNextFile()
         {
@@ -60,20 +66,16 @@ namespace Soundbard.Services
                 _currentIndex++;
 
                 if (_currentIndex >= _filePaths.Count)
-                {
                     _currentIndex = 0;
-                }
 
                 return _filePaths[_currentIndex];
             }
             else
             {
-                int index;
                 if (_filePaths.Count == 1)
-                {
                     return _filePaths[0];
-                }
 
+                int index;
                 do
                 {
                     index = _random.Next(0, _filePaths.Count);
@@ -81,118 +83,254 @@ namespace Soundbard.Services
                 while (index == _currentIndex);
 
                 _currentIndex = index;
-
                 return _filePaths[index];
             }
         }
 
         /// <summary>
-        /// Checks if a file is loaded, if not, it loads the next file.
+        /// Preloads the next file into _nextPlayer.
+        /// This is the ONLY place where GetNextFile is called.
         /// </summary>
-        private void EnsureFileLoaded()
+        private void PreloadNext()
         {
-            if (_currentFile == null && _filePaths.Count > 0)
+            var next = GetNextFile();
+
+            if (next != null)
             {
-                var next = GetNextFile();
-                if (next != null)
-                {
-                    Load(next);
-                }
+                Load(_nextPlayer, next);
             }
         }
 
         /// <summary>
-        /// Toggles between playing and pausing.
+        /// Swaps current and next players.
+        /// Also reassigns MediaEnded event correctly.
+        /// </summary>
+        private void SwapPlayers()
+        {
+            _currentPlayer.MediaEnded -= OnMediaEnded;
+
+            var temp = _currentPlayer;
+            _currentPlayer = _nextPlayer;
+            _nextPlayer = temp;
+
+            _currentPlayer.MediaEnded += OnMediaEnded;
+        }
+
+        /// <summary>
+        /// Ensures first track is loaded and next track is preloaded.
+        /// </summary>
+        private void InitializePlayback()
+        {
+            if (_currentFile != null || _filePaths.Count == 0)
+                return;
+
+            var first = GetNextFile();
+            if (first == null) return;
+
+            Load(_currentPlayer, first);
+
+            PreloadNext();
+        }
+
+        /// <summary>
+        /// Toggles play/pause.
         /// </summary>
         public void PlayPause()
         {
-            EnsureFileLoaded();
+            InitializePlayback();
 
             if (_currentFile == null) return;
 
             if (_isPlaying)
             {
-                _player.Pause();
+                _currentPlayer.Pause();
                 _isPlaying = false;
                 PlayingChanged?.Invoke(false);
+                StopInterval();
             }
             else
             {
-                _player.Play();
+                _currentPlayer.Play();
                 _isPlaying = true;
                 PlayingChanged?.Invoke(true);
+                if (_track.PlayMode == PlayMode.Interval)
+                {
+                    StartInterval();
+                }
             }
         }
 
         /// <summary>
-        /// Sets the volume to the slider.
-        /// </summary>
-        public void SetVolume(int volume)
-        {
-            volume = Math.Max(0, Math.Min(100, volume));
-
-            _player.Volume = volume / 100.0;
-        }
-
-        /// <summary>
-        /// Stops playback entirely and resets position.
-        /// </summary>
-        public void Stop()
-        {
-            _player.Stop();
-            HandlePlaybackStopped();
-        }
-
-        /// <summary>
-        /// When OnMediaEnded event fires, decide which action to take
+        /// Handles what happens when a track finishes.
         /// </summary>
         private void OnMediaEnded(object? sender, EventArgs e)
         {
             switch (_track.PlayMode)
             {
                 case PlayMode.Continuous:
-                    var nextContinuous = GetNextFile();
-                    if (nextContinuous != null)
-                    {
-                        Load(nextContinuous);
-                        _player.Play();
-
-                        _isPlaying = true;
-                        PlayingChanged?.Invoke(true);
-                    }
-                    else
-                    {
-                        HandlePlaybackStopped();
-                    }
+                    PlayNextInternal(autoPlay: true);
                     break;
 
                 case PlayMode.Manual:
-                    HandlePlaybackStopped();
-
-                    var nextManual = GetNextFile();
-                    if (nextManual != null)
-                    {
-                        Load(nextManual);
-                    }
-
-
+                    PlayNextInternal(autoPlay: false);
                     break;
 
                 case PlayMode.Interval:
-                    // future logic
-                    HandlePlaybackStopped();
                     break;
             }
         }
 
         /// <summary>
-        /// Sets the track IsPlaying to false
+        /// Plays or sets up the next file depending on Continious mode or Manual
+        /// </summary>
+        private void PlayNextInternal(bool autoPlay)
+        {
+            SwapPlayers();
+
+            if (_currentIndex >= 0 && _currentIndex < _filePaths.Count)
+            {
+                _currentFile = _filePaths[_currentIndex];
+                FileChanged?.Invoke(Path.GetFileNameWithoutExtension(_currentFile));
+            }
+
+            if (autoPlay)
+            {
+                _currentPlayer.Play();
+                _isPlaying = true;
+                PlayingChanged?.Invoke(true);
+            }
+            else
+            {
+                HandlePlaybackStopped();
+            }
+
+            PreloadNext();
+        }
+
+        /// <summary>
+        /// Plays next audio file for interval mode
+        /// </summary>
+        private void PlayNextInterval()
+        {
+            SwapPlayers();
+            PreloadNext();
+
+            if (_currentIndex >= 0 && _currentIndex < _filePaths.Count)
+            {
+                _currentFile = _filePaths[_currentIndex];
+                FileChanged?.Invoke(Path.GetFileNameWithoutExtension(_currentFile));
+            }
+
+            _currentPlayer.Play();
+        }
+
+        /// <summary>
+        /// Interval timer event
+        /// </summary>
+        private void OnIntervalTick(object? sender, EventArgs e)
+        {
+            _intervalTimer?.Stop();
+
+            PlayNextInterval();
+
+            StartInterval();
+        }
+
+        /// <summary>
+        /// Calculate next interval using the _track values
+        /// </summary>
+        private TimeSpan GetNextInterval()
+        {
+            int baseSeconds = _track.IntervalSeconds;
+            int deviation = _track.IntervalDeviation;
+
+            int offset;
+
+            if (deviation > 0)
+            {
+                offset = _random.Next(-deviation, deviation + 1);
+            }
+            else
+            {
+                offset = 0;
+            }
+
+            int finalSeconds = Math.Max(0, baseSeconds + offset);
+
+            return TimeSpan.FromSeconds(finalSeconds);
+        }
+
+        /// <summary>
+        /// Starts the interval timer
+        /// </summary>
+        private void StartInterval()
+        {
+            StopInterval();
+
+            var interval = GetNextInterval();
+            _nextTriggerTime = DateTime.Now.Add(interval);
+
+            _intervalTimer = new DispatcherTimer
+            {
+                Interval = interval
+            };
+
+            _intervalTimer.Tick += OnIntervalTick;
+            _intervalTimer.Start();
+        }
+
+        /// <summary>
+        /// Stops the interval timer
+        /// </summary>
+        private void StopInterval()
+        {
+            if (_intervalTimer == null) return;
+
+            _intervalTimer.Stop();
+            _intervalTimer.Tick -= OnIntervalTick;
+            _intervalTimer = null;
+        }
+
+        /// <summary>
+        /// Sets the volume of _currentPlayer
+        /// </summary>
+        public void SetVolume(int volume)
+        {
+            volume = Math.Max(0, Math.Min(100, volume));
+            _currentPlayer.Volume = volume / 100.0;
+        }
+
+        /// <summary>
+        /// Stops playback on _currentPlayer
+        /// </summary>
+        public void Stop()
+        {
+            StopInterval();
+            _currentPlayer.Stop();
+            HandlePlaybackStopped();
+        }
+
+        /// <summary>
+        /// Sets _isPlaying to false and invokes playing changed event
         /// </summary>
         private void HandlePlaybackStopped()
         {
-            _player.Stop();
             _isPlaying = false;
             PlayingChanged?.Invoke(false);
+        }
+
+        /// <summary>
+        /// Nukes the Audio services and timers.
+        /// </summary>
+        public void Dispose()
+        {
+            _currentPlayer.MediaEnded -= OnMediaEnded;
+
+            _currentPlayer.Stop();
+            _currentPlayer.Close();
+
+            _nextPlayer.Stop();
+            _nextPlayer.Close();
         }
     }
 }

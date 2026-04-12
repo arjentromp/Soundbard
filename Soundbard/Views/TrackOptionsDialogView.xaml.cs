@@ -106,7 +106,7 @@ namespace Soundbard.Views
                 FadeEnabled = FadeEnabledBox.IsChecked == true,
                 FadeDuration = fadeDuration > 0 ? fadeDuration : 2,
                 IntervalSeconds = intervalSeconds > 0 ? intervalSeconds : 30,
-                IntervalDeviation = intervalDeviation > 0 ? intervalDeviation : 10,
+                IntervalDeviation = intervalDeviation >= 0 ? intervalDeviation : 10,
                 Volume = 75
             };
 
