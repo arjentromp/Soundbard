@@ -231,13 +231,24 @@
                             Width="25"
                             Height="25"
                             Margin="0,0,5,0"
+                            Command="{Binding PlayPauseCommand}"
                             Style="{StaticResource TrackCardIconButton}">
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 FontSize="20"
-                                Foreground="White"
-                                Text="▶" />
+                                Foreground="White">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="▶" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                                <Setter Property="Text" Value="❚❚" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </Button>
                     </Grid>
                 </Border>
@@ -273,12 +284,23 @@
                 </ItemsControl>
 
                 <TextBlock Grid.Row="1" Margin="5">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Hidden" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+
                     <Run Foreground="#5a5550" Text="Now Playing: " />
                     <LineBreak />
                     <Run
                         FontStyle="Italic"
                         Foreground="White"
-                        Text="battle music epic.mp3" />
+                        Text="{Binding CurrentFileName}" />
                 </TextBlock>
             </Grid>
             <Border
@@ -297,7 +319,7 @@
                         VerticalAlignment="Center"
                         IsMoveToPointEnabled="True"
                         Style="{StaticResource VolumeSlider}"
-                        Value="75" />
+                        Value="{Binding Volume, Mode=TwoWay}" />
                 </StackPanel>
             </Border>
 

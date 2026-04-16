@@ -105,9 +105,8 @@ namespace Soundbard.Views
                 },
                 FadeEnabled = FadeEnabledBox.IsChecked == true,
                 FadeDuration = fadeDuration > 0 ? fadeDuration : 2,
-                IntervalEnabled = IntervalEnabledBox.IsChecked == true,
                 IntervalSeconds = intervalSeconds > 0 ? intervalSeconds : 30,
-                IntervalDeviation = intervalDeviation > 0 ? intervalDeviation : 10,
+                IntervalDeviation = intervalDeviation >= 0 ? intervalDeviation : 10,
                 Volume = 75
             };
 
@@ -152,7 +151,6 @@ namespace Soundbard.Views
 
             FadeEnabledBox.IsChecked = vm.FadeEnabled;
             FadeDurationBox.Text = vm.FadeDuration.ToString();
-            IntervalEnabledBox.IsChecked = vm.IntervalEnabled;
             IntervalDurationBox.Text = vm.IntervalSeconds.ToString();
             IntervalDeviationBox.Text = vm.IntervalDeviation.ToString();
         }
