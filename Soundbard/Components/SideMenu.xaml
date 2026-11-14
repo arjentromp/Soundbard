@@ -12,11 +12,13 @@
         <Button
             x:Name="btnSave"
             Height="40"
+            Click="Save_Click"
             Content="💾"
             Style="{StaticResource SideMenuButton}" />
         <Button
             x:Name="btnLoad"
             Height="40"
+            Click="Load_Click"
             Content="📂"
             Style="{StaticResource SideMenuButton}" />
         <Button

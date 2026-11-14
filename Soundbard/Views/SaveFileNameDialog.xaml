@@ -1,0 +1,59 @@
+<Window
+    x:Class="Soundbard.Views.SaveFileNameDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Save Profile"
+    Width="360"
+    Height="180"
+    Background="#1f1d1b"
+    ResizeMode="NoResize"
+    WindowStartupLocation="CenterOwner"
+    WindowStyle="None">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Margin="0,0,0,12"
+            Foreground="White"
+            FontSize="16"
+            Text="Name this save file" />
+        <TextBox
+            x:Name="FileNameBox"
+            Grid.Row="1"
+            Padding="8,6"
+            Background="#292623"
+            BorderBrush="#af9241"
+            CaretBrush="White"
+            Foreground="White"
+            Text="Profile" />
+        <TextBlock
+            x:Name="ValidationMessage"
+            Grid.Row="2"
+            Margin="0,6,0,0"
+            Foreground="#e07a68"
+            Visibility="Collapsed" />
+        <StackPanel
+            Grid.Row="3"
+            Margin="0,14,0,0"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
+            <Button
+                Width="80"
+                Margin="0,0,8,0"
+                Padding="8,5"
+                Click="Cancel_Click"
+                Content="Cancel" />
+            <Button
+                Width="80"
+                Padding="8,5"
+                Click="Save_Click"
+                Content="Save" />
+        </StackPanel>
+    </Grid>
+</Window>

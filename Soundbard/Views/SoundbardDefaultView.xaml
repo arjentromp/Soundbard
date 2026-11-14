@@ -29,7 +29,9 @@
                     <ColumnDefinition Width="18*" />
                 </Grid.ColumnDefinitions>
 
-                <components:SideMenu Grid.Column="0" />
+                <components:SideMenu
+                    Grid.Column="0"
+                    DataContext="{Binding DataContext, ElementName=workspace}" />
 
                 <components:FolderTree Grid.Column="1" />
 
@@ -41,7 +43,7 @@
                     Background="#262422"
                     ResizeBehavior="PreviousAndNext" />
 
-                <components:Workspace Grid.Column="3" />
+                <components:Workspace x:Name="workspace" Grid.Column="3" />
 
             </Grid>
         </Grid>

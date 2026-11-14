@@ -189,9 +189,11 @@ namespace Soundbard.ViewModels
         /// </summary>
         public ICommand DeleteCommand => new RelayCommand(() =>
         {
-            _audioService.Dispose();
+            DisposeAudioService();
             _workspace.DeleteTrack(this);
         });
+
+        public void DisposeAudioService() => _audioService.Dispose();
 
         /// <summary>
         /// Toggles playback on this track between playing and paused.
